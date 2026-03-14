@@ -32,41 +32,47 @@ ________________________________________
 
 📈 School-Wide Averages
 
-Category	Average Metric
-
-Math Score	69.91
-
-English Score	69.82
-
-Science Score	69.83
-
-Attendance Rate	80.16%
+* **Math Score:** 69.91
+* **English Score:** 69.82
+* **Science Score:** 69.83
+* **Attendance Rate:** 80.16%
 
 🚻  1 Gender Performance Breakdown (Subject-by-Subject)
 
 Analysis of subject scores reveals specific strengths across genders:
 
-	Male Average	 and Female Average
+*  **Science Score**
+   Male Average: 69.90
+   Female Average: 69.75
+   
+* **Mathematics Score**
+   Male Average: 69.95
+   Female Average: 69.88
+  
+* **English Score**
+  Male Average: 69.65
+   Female Average: 70.00
+  
+* **Attendance Rate**
+  Male Average: 80.05%
+  Female Average: 80.25%
 
-Science	69.90	69.75
-
-Mathematics	69.95	69.88
-
-English	69.65	70.00
-
-Attendance	80.05%	80.25%
-
+	
  🏫 2. Grade Level & Study Group Standing
  
 Segment	Metric / Status	Significance
 
-Grade 9	80.52% Attendance	Highest engagement level.
-
-Grade 12	79.80% Attendance	Lowest attendance; priority for intervention.
-
-Group C	80.55% Presence	Academic and attendance leaders.
-
-Group B	Lowest Engagement (79.64%)	High score volatility.
+* **Grade 9** — `80.52% Attendance`
+  * 💡 **Highest engagement level.**
+    
+* **Grade 12** — `79.80% Attendance`
+  * ⚠️ **Lowest attendance; priority for intervention.**
+    
+* **Group C** — `80.55% Presence`
+  * 🏆 **Academic and attendance leaders.**
+    
+* **Group B** — `79.64% Engagement`
+  * 📉 **High score volatility.**
 ________________________________________
 🎯 Priority Student Lists (Data-Driven Action)
 
