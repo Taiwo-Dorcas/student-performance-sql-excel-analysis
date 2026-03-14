@@ -85,11 +85,13 @@ SELECT * FROM students;
 # Basic Insights – School Snapshot 
 # 1. Provide a list of all students with their grade level and study group. (Principal wants a quick 
 # overview.) 
+ 
 SELECT student_id,grade_level,study_group FROM students;
 # 2. Show the total number of students by gender. (School wants to track gender balance.) 
 SELECT gender, COUNT(student_id) AS Total_students
 FROM students
 GROUP BY gender;
+
 # 3. Calculate the average score in each subject across the school. (Academic board wants subject-level 
 # insights.) 
 SELECT subject,Round(AVG(score),1) AS Avg_score
@@ -99,11 +101,13 @@ GROUP BY subject;
 SELECT student_id,subject,score
 FROM scores
 WHERE subject = "Mathematics" AND score>80;
+
 # Knowing the top results
 SELECT student_id,subject,score
 FROM scores
 WHERE subject = "Mathematics" AND score>80
 ORDER BY score DESC;
+
 # Additional insight (How many students scored above 80 in Math)
 SELECT subject, COUNT(student_id) AS student_count
 FROM scores
@@ -150,11 +154,13 @@ WHERE extra_curricular = "sports" AND attendance_percent > 85;
 # 11. Count the number of students in each extracurricular activity. (Helps plan budget allocation.) 
 SELECT extra_curricular,COUNT(student_id) AS student_count FROM extracurricular
 GROUP BY extra_curricular;
+
 # 12. Which subject has the highest overall average score? (School wants to highlight academic strengths.) 
 SELECT subject,Round(AVG(score),2) AS H_Avg_Score
 FROM scores
 GROUP BY subject
 ORDER BY  H_Avg_Score DESC LIMIT 1;
+
 # 13. Show average attendance percentage grouped by study group. (Track study group discipline.) 
 SELECT s.study_group,Round(AVG(a.attendance_percent),2)AS Avg_attendance
 FROM Students s
@@ -166,6 +172,7 @@ ORDER BY Avg_attendance DESC;
 SELECT *  FROM attendance
 WHERE attendance_percent >=100;
 # No student with pefect attendance
+ 
 # 15. What is the average Math score of students who do not participate in extracurricular activities?
 # (Check if academics-only students perform better.)
 SELECT s.subject,s.score,s.student_id,e.extra_curricular,Round(AVG(score),1) AS Avg_math_score FROM scores s
@@ -189,23 +196,83 @@ SELECT study_group, AVG(attendance_percent)FROM students
 JOIN attendance ON students.student_id=attendance.student_id
 WHERE attendance_percent = (SELECT AVG(attendance_percent) FROM attendance
  ORDER BY attendance_percent);
-19. Identify the student(s) with the highest average Science score. (Nominees for Science competition.) 
-20. Which grade level has the lowest Math average score? (Principal wants targeted intervention.) 
-21. Retrieve the average attendance % by extracurricular activity and rank them. (Check which 
-activities affect attendance positively.) 
-22. Which students scored above their gender’s average in all three subjects? (Equity-focused 
-performance check.) 
-23. Show the difference between male and female average scores per subject. (Gender performance gap 
-analysis.) 
-24. Which Grade 12 students have attendance above the school-wide average? (Final-year students’ 
-discipline check.) 
-25. Identify top performers: students with an average score above 85 and attendance above 90%. 
-(Candidates for “Student of the Year.”) 
-Extended Insights – Going Beyond 
-26. Which extracurricular activity has the highest number of participants in Grade 11? (Helps allocate
-27. List the bottom 5 students with the lowest average scores. (For remedial class recommendation.) 
-28. Show the grade level with the best overall performance across all subjects. (Principal wants to 
-reward the best class.)
+
+# 19. Identify the student(s) with the highest average Science score. (Nominees for Science competition.) 
+SELECT student_id, subject,Round(AVG(score),2) AS Avg_score FROM scores
+WHERE subject = "Science"
+GROUP BY student_id,subject
+ORDER BY Avg_score DESC LIMIT 5;
+
+# 20. Which grade level has the lowest Math average score? (Principal wants targeted intervention.) 
+SELECT st.grade_level,s.subject,Round(AVG(score),2) AS Avg_score FROM scores s
+LEFT JOIN students st ON s.student_id=st.student_id
+WHERE subject ="Mathematics"
+GROUP BY st.grade_level,s.subject
+ORDER BY Avg_score LIMIT 1; 
+
+# 21. Retrieve the average attendance % by extracurricular activity and rank them. (Check which 
+# activities affect attendance positively.) 
+SELECT e.extra_curricular,Round(AVG(a.attendance_percent),2)AS Avg_attendance FROM attendance a
+LEFT JOIN extracurricular e ON a.student_id = e.student_id
+GROUP BY e.extra_curricular
+ORDER BY Avg_attendance DESC;
+
+#22. Which students scored above their gender’s average in all three subjects? (Equity-focused 
+WITH Gender_avg AS (SELECT s.gender,sc.subject,ROUND(AVG(sc.score),2) AS avg_score FROM Students s
+JOIN Scores sc ON s.student_id = sc.student_id
+GROUP BY s.gender,sc.subject)
+ SELECT s.student_id FROM Students s
+ JOIN Scores sc ON s.student_id = sc.student_id
+ JOIN Gender_avg ga ON s.gender = ga.subject
+ GROUP BY s.student_id,ga.avg_score
+ HAVING MIN(sc.score) > ga.avg_score;
+
+# 23. Show the difference between male and female average scores per subject. (Gender performance gap 
+# analysis.) 
+SELECT subject,
+Round(AVG(CASE WHEN gender = "Male" THEN score END),2) AS Male_avg,
+Round(AVG(CASE WHEN gender = "Female" THEN score END),2) AS Female_avg,
+Round(AVG(CASE WHEN gender = "Male"  THEN score END),2) -
+Round(AVG(CASE WHEN gender = "Female" THEN score END),2)AS score_diff
+FROM students s
+JOIN Scores sc ON s.student_id = 
+sc.student_id
+GROUP BY Subject;
+# 24. Which Grade 12 students have attendance above the school-wide average? (Final-year students’ 
+# discipline check.) 
+SELECT a.student_id,a.attendance_percent FROM Students s
+JOIN Attendance a ON s.student_id = a. student_id
+WHERE s.grade_level = 12
+AND a.attendance_percent > (SELECT AVG(a.attendance_percent) FROM Attendance);
+
+# 25. Identify top performers: students with an average score above 85 and attendance above 90%. 
+# (Candidates for “Student of the Year.”) 
+SELECT s.student_id,a.attendance_percent,Round(AVG(sc.score),2) AS Avg_score FROM Students s
+JOIN Scores sc ON s.student_id = sc.student_id
+JOIN Attendance a ON s.student_id = a.student_id
+GROUP BY s.student_id, a.attendance_percent
+HAVING AVG(sc.score) > 85 AND a.attendance_percent >90;
+
+
+# Extended Insights – Going Beyond 
+# 26. Which extracurricular activity has the highest number of participants in Grade 11? (Helps allocate
+SELECT e.extra_curricular,st.grade_level FROM students st
+LEFT JOIN extracurricular e ON st.student_id = e.student_id
+WHERE grade_level = "Grade 11"
+ORDER BY extra_curricular DESC LIMIT 1;
+
+# 27. List the bottom 5 students with the lowest average scores. (For remedial class recommendation.) 
+SELECT student_id,Round(AVG(score),2) AS Avg_score  FROM scores
+GROUP BY  student_id
+ORDER BY Avg_score LIMIT 5;
+
+# 28. Show the grade level with the best overall performance across all subjects. (Principal wants to 
+# reward the best class.)
+SELECT s.grade_level,Round(AVG(sc.score),2)AS overall_avg_score FROM Students s
+JOIN Scores sc ON s.student_id = sc.student_id
+GROUP BY s.grade_level
+ORDER BY overall_avg_score DESC LIMIT 1;
+
 
 
 
